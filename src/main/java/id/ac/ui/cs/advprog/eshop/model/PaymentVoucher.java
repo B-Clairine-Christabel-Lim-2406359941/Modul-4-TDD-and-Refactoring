@@ -11,11 +11,12 @@ public class PaymentVoucher extends Payment {
 
     private void validateVoucher() {
         String code = this.getPaymentData().get("voucherCode");
-        if (code != null && code.length() == 16 && code.startsWith("ESHOP")) {
-            long digitCount = code.chars().filter(Character::isDigit).count();
-            if (digitCount == 8) {
-                this.setStatus("SUCCESS");
-            }
+        if (code == null || code.length() != 16 || !code.startsWith("ESHOP")) {
+            return;
+        }
+        long digitCount = code.chars().filter(Character::isDigit).count();
+        if (digitCount == 8) {
+            this.setStatus("SUCCESS");
         }
     }
 }
