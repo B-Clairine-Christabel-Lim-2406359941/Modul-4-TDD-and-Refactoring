@@ -17,7 +17,7 @@ class PaymentServiceTest {
     @Test
     void testSetStatusUpdatesOrder() {
         PaymentRepository repo = new PaymentRepository();
-        PaymentService service = new PaymentService(repo);
+        PaymentService service = new PaymentServiceImpl(repo);
 
         List<Product> products = new ArrayList<>();
         Product dummyProduct = new Product();
