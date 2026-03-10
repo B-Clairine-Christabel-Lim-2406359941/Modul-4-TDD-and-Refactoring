@@ -2,6 +2,8 @@ package id.ac.ui.cs.advprog.eshop.service;
 
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
+import id.ac.ui.cs.advprog.eshop.model.PaymentCashOnDelivery;
+import id.ac.ui.cs.advprog.eshop.model.PaymentVoucher;
 import id.ac.ui.cs.advprog.eshop.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +22,16 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
         String id = UUID.randomUUID().toString();
-        Payment payment = new Payment(id, method, paymentData, order);
+        Payment payment;
+
+        if ("VOUCHER".equals(method)) {
+            payment = new PaymentVoucher(id, method, paymentData, order);
+        } else if ("CASH_ON_DELIVERY".equals(method)) {
+            payment = new PaymentCashOnDelivery(id, method, paymentData, order);
+        } else {
+            payment = new Payment(id, method, paymentData, order);
+        }
+
         return paymentRepository.save(payment);
     }
 

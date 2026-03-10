@@ -17,30 +17,6 @@ public class Payment {
         this.paymentData = paymentData;
         this.order = order;
         this.status = "REJECTED";
-
-        if ("VOUCHER".equals(method)) {
-            validateVoucher();
-        } else if ("CASH_ON_DELIVERY".equals(method)) {
-            validateCashOnDelivery();
-        }
-    }
-
-    private void validateVoucher() {
-        String code = paymentData.get("voucherCode");
-        if (code != null && code.length() == 16 && code.startsWith("ESHOP")) {
-            long digitCount = code.chars().filter(Character::isDigit).count();
-            if (digitCount == 8) {
-                this.status = "SUCCESS";
-            }
-        }
-    }
-
-    private void validateCashOnDelivery() {
-        String address = paymentData.get("address");
-        String fee = paymentData.get("deliveryFee");
-        if (address != null && !address.trim().isEmpty() && fee != null && !fee.trim().isEmpty()) {
-            this.status = "SUCCESS";
-        }
     }
 
     public String getId() { return id; }
