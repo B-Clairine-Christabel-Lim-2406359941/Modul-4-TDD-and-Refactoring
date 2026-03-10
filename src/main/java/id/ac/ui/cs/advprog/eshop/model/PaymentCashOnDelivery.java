@@ -12,7 +12,11 @@ public class PaymentCashOnDelivery extends Payment {
     private void validateCashOnDelivery() {
         String address = this.getPaymentData().get("address");
         String fee = this.getPaymentData().get("deliveryFee");
-        if (address != null && !address.trim().isEmpty() && fee != null && !fee.trim().isEmpty()) {
+
+        boolean isAddressValid = address != null && !address.trim().isEmpty();
+        boolean isFeeValid = fee != null && !fee.trim().isEmpty();
+
+        if (isAddressValid && isFeeValid) {
             this.setStatus("SUCCESS");
         }
     }
