@@ -3,82 +3,117 @@ package id.ac.ui.cs.advprog.eshop.controller;
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
 import id.ac.ui.cs.advprog.eshop.model.Product;
-import id.ac.ui.cs.advprog.eshop.service.OrderService;
 import id.ac.ui.cs.advprog.eshop.service.PaymentService;
-import id.ac.ui.cs.advprog.eshop.service.ProductService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@SpringBootTest
-@AutoConfigureMockMvc
+@WebMvcTest(PaymentController.class)
 class PaymentControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
+    @MockBean
     private PaymentService paymentService;
 
-    @Autowired
-    private ProductService productService;
+    private Payment payment;
+    private Order order;
 
-    @Autowired
-    private OrderService orderService;
+    @BeforeEach
+    void setUp() {
+        List<Product> products = new ArrayList<>();
+        Product product = new Product();
+        product.setProductId("prod-1");
+        product.setProductName("Sampo Cap Bambang");
+        product.setProductQuantity(2);
+        products.add(product);
+
+        order = new Order("ord-123", products, 1708560000L, "Safira Sudrajat");
+        payment = new Payment("pay-123", "VOUCHER",
+                Map.of("voucherCode", "ESHOP1234ABC5678"), order);
+    }
 
     @Test
     void testGetPaymentDetailForm() throws Exception {
         mockMvc.perform(get("/payment/detail"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(view().name("paymentDetailForm"));
     }
 
     @Test
-    void testGetPaymentDetailById() throws Exception {
+    void testGetPaymentDetailByIdFound() throws Exception {
+        when(paymentService.getPayment("pay-123")).thenReturn(payment);
+
         mockMvc.perform(get("/payment/detail/pay-123"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(view().name("paymentDetail"))
+                .andExpect(model().attribute("payment", payment))
+                .andExpect(model().attribute("paymentId", "pay-123"));
+    }
+
+    @Test
+    void testGetPaymentDetailByIdNotFound() throws Exception {
+        when(paymentService.getPayment("pay-999")).thenReturn(null);
+
+        mockMvc.perform(get("/payment/detail/pay-999"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("paymentDetail"))
+                .andExpect(model().attributeDoesNotExist("payment"));
     }
 
     @Test
     void testGetPaymentAdminList() throws Exception {
+        List<Payment> payments = List.of(payment);
+        when(paymentService.getAllPayments()).thenReturn(payments);
+
         mockMvc.perform(get("/payment/admin/list"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(view().name("paymentList"))
+                .andExpect(model().attribute("payments", payments));
     }
 
     @Test
     void testGetPaymentAdminDetail() throws Exception {
+        when(paymentService.getPayment("pay-123")).thenReturn(payment);
+
         mockMvc.perform(get("/payment/admin/detail/pay-123"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(view().name("paymentAdminDetail"))
+                .andExpect(model().attribute("payment", payment));
     }
 
     @Test
-    void testPostPaymentAdminSetStatus() throws Exception {
-        // Create prerequisite data
-        Product product = new Product();
-        product.setProductName("Admin Test Product");
-        product.setProductQuantity(1);
-        productService.create(product);
+    void testPostSetPaymentStatusSuccess() throws Exception {
+        when(paymentService.getPayment("pay-123")).thenReturn(payment);
 
-        List<Product> products = productService.findAll();
-        Order order = new Order("admin-test-order", products, System.currentTimeMillis(), "admin");
-        orderService.createOrder(order);
-
-        Map<String, String> paymentData = new HashMap<>();
-        paymentData.put("voucherCode", "ESHOP1234ABC5678");
-        Payment payment = paymentService.addPayment(order, "VOUCHER", paymentData);
-
-        mockMvc.perform(post("/payment/admin/set-status/" + payment.getId())
+        mockMvc.perform(post("/payment/admin/set-status/pay-123")
                         .param("status", "SUCCESS"))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/payment/admin/list"));
+
+        verify(paymentService, times(1)).setStatus(payment, "SUCCESS");
+    }
+
+    @Test
+    void testPostSetPaymentStatusNotFound() throws Exception {
+        when(paymentService.getPayment("pay-999")).thenReturn(null);
+
+        mockMvc.perform(post("/payment/admin/set-status/pay-999")
+                        .param("status", "SUCCESS"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/payment/admin/list"));
+
+        verify(paymentService, never()).setStatus(any(), anyString());
     }
 }

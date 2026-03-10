@@ -76,4 +76,23 @@ class OrderTest {
         Order order = new Order("13652556-0128-4c07-b546-54eb1396d79b", this.products, 1708568080L, "Safira Sudrajat");
         assertThrows(IllegalArgumentException.class, () -> order.setStatus("MEOW"));
     }
+
+    @Test
+    void testCreateOrderUsingBuilder() {
+        Order.OrderBuilder builder = Order.builder()
+                .id("13652556-0128-4c07-b546-54eb1396d79b")
+                .products(this.products)
+                .orderTime(1708568080L)
+                .author("Safira Sudrajat")
+                .status("SUCCESS");
+                
+        assertNotNull(builder.toString()); // Cover the builder's toString method
+        Order order = builder.build();
+
+        assertEquals("13652556-0128-4c07-b546-54eb1396d79b", order.getId());
+        assertEquals(this.products, order.getProducts());
+        assertEquals(1708568080L, order.getOrderTime());
+        assertEquals("Safira Sudrajat", order.getAuthor());
+        assertEquals("SUCCESS", order.getStatus());
+    }
 }
