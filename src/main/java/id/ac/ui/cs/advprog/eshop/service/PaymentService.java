@@ -3,11 +3,13 @@ package id.ac.ui.cs.advprog.eshop.service;
 import id.ac.ui.cs.advprog.eshop.model.Order;
 import id.ac.ui.cs.advprog.eshop.model.Payment;
 import id.ac.ui.cs.advprog.eshop.repository.PaymentRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+@Service
 public class PaymentService {
     private final PaymentRepository paymentRepository;
 
@@ -17,7 +19,7 @@ public class PaymentService {
 
     public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
         String id = UUID.randomUUID().toString();
-        Payment payment = new Payment(id, method, paymentData);
+        Payment payment = new Payment(id, method, paymentData, order);
         return paymentRepository.save(payment);
     }
 
