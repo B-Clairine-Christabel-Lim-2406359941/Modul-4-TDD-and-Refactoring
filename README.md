@@ -53,7 +53,7 @@ Masalah *clean code* yang terjadi adalah **Code Duplication** dan pelanggaran pr
 
   Dengan cara ini, setup hanya ditulis satu kali dan bisa digunakan kembali oleh semua functional test, menjadikan kode lebih bersih dan mudah dikelola.
 
-## Reflection 2
+## Reflection 3
 
 ### 1. Code Quality Issues Fixed
    Dalam pengerjaan modul ini, saya melakukan pembersihan kode berdasarkan temuan code smells dari dashboard SonarCloud untuk meningkatkan kualitas aplikasi. Salah satu masalah yang saya perbaiki adalah keberadaan empty methods pada kelas pengujian yang dianggap tidak memiliki tujuan fungsional dan hanya mengotori kode. Strategi perbaikan yang saya terapkan adalah menghapus metode setup yang kosong atau menambahkan logika asersi yang bermakna agar setiap bagian kode memiliki peran yang jelas. Selain itu, saya juga menghapus beberapa unused imports dan merapikan kembali struktur kode agar lebih ringkas dan mudah dipelihara di masa depan. Masalah kritis lain yang saya tangani adalah perbaikan naming convention pada file HTML agar konsisten menggunakan huruf kecil, karena lingkungan Linux pada CI/CD sangat sensitif terhadap perbedaan huruf kapital. Melalui serangkaian perbaikan ini, kode saya kini memiliki tingkat maintainability yang jauh lebih baik dan berhasil melewati standar Quality Gate yang ditetapkan.
