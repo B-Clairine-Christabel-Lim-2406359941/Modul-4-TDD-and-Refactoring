@@ -1,7 +1,6 @@
 package id.ac.ui.cs.advprog.eshop.model;
 
 import lombok.Setter;
-
 import java.util.Map;
 
 public class Payment {
@@ -20,20 +19,27 @@ public class Payment {
         this.status = "REJECTED";
 
         if ("VOUCHER".equals(method)) {
-            String code = paymentData.get("voucherCode");
-            if (code != null && code.length() == 16 && code.startsWith("ESHOP")) {
-                long digitCount = code.chars().filter(Character::isDigit).count();
-                if (digitCount == 8) {
-                    this.status = "SUCCESS";
-                }
-            }
+            validateVoucher();
         } else if ("CASH_ON_DELIVERY".equals(method)) {
-            String address = paymentData.get("address");
-            String fee = paymentData.get("deliveryFee");
+            validateCashOnDelivery();
+        }
+    }
 
-            if (address != null && !address.trim().isEmpty() && fee != null && !fee.trim().isEmpty()) {
+    private void validateVoucher() {
+        String code = paymentData.get("voucherCode");
+        if (code != null && code.length() == 16 && code.startsWith("ESHOP")) {
+            long digitCount = code.chars().filter(Character::isDigit).count();
+            if (digitCount == 8) {
                 this.status = "SUCCESS";
             }
+        }
+    }
+
+    private void validateCashOnDelivery() {
+        String address = paymentData.get("address");
+        String fee = paymentData.get("deliveryFee");
+        if (address != null && !address.trim().isEmpty() && fee != null && !fee.trim().isEmpty()) {
+            this.status = "SUCCESS";
         }
     }
 
