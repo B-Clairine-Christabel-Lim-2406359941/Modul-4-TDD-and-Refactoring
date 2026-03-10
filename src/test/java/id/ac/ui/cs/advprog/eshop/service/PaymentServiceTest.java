@@ -20,7 +20,13 @@ class PaymentServiceTest {
         PaymentService service = new PaymentService(repo);
 
         List<Product> products = new ArrayList<>();
-        Order order = new Order("ord1", products, 123456789L, "clairine.christabel", "PENDING");
+        Product dummyProduct = new Product();
+        dummyProduct.setProductId("prod-1");
+        dummyProduct.setProductName("Kecap Dummy");
+        dummyProduct.setProductQuantity(1);
+        products.add(dummyProduct);
+
+        Order order = new Order("ord1", products, 123456789L, "clairine.christabel", "WAITING_PAYMENT");
 
         Map<String, String> paymentData = new HashMap<>();
         Payment payment = service.addPayment(order, "VOUCHER", paymentData);
