@@ -1,0 +1,43 @@
+package id.ac.ui.cs.advprog.eshop.service;
+
+import id.ac.ui.cs.advprog.eshop.model.Order;
+import id.ac.ui.cs.advprog.eshop.model.Payment;
+import id.ac.ui.cs.advprog.eshop.repository.PaymentRepository;
+
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+public class PaymentService {
+    private final PaymentRepository paymentRepository;
+
+    public PaymentService(PaymentRepository paymentRepository) {
+        this.paymentRepository = paymentRepository;
+    }
+
+    public Payment addPayment(Order order, String method, Map<String, String> paymentData) {
+        String id = UUID.randomUUID().toString();
+        Payment payment = new Payment(id, method, paymentData);
+        return paymentRepository.save(payment);
+    }
+
+    public Payment setStatus(Payment payment, String status) {
+        payment.setStatus(status);
+        Order order = payment.getOrder();
+
+        if ("SUCCESS".equals(status)) {
+            order.setStatus("SUCCESS");
+        } else if ("REJECTED".equals(status)) {
+            order.setStatus("FAILED");
+        }
+        return payment;
+    }
+
+    public Payment getPayment(String paymentId) {
+        return paymentRepository.findById(paymentId);
+    }
+
+    public List<Payment> getAllPayments() {
+        return paymentRepository.findAll();
+    }
+}
