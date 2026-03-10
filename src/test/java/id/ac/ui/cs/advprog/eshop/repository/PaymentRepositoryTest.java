@@ -4,12 +4,14 @@ import id.ac.ui.cs.advprog.eshop.model.Payment;
 import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 import java.util.HashMap;
+import java.util.Map;
 
 class PaymentRepositoryTest {
     @Test
     void testSaveAndFindPayment() {
         PaymentRepository repo = new PaymentRepository();
-        Payment payment = new Payment("1", "VOUCHER", new HashMap<>());
+        Map<String, String> paymentData = new HashMap<>();
+        Payment payment = new Payment("1", "VOUCHER", paymentData, null);
         repo.save(payment);
 
         assertEquals(payment, repo.findById("1"));

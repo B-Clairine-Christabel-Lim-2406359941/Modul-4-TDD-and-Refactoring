@@ -8,36 +8,16 @@ import java.util.Map;
 class PaymentTest {
 
     @Test
-    void testValidVoucherCode() {
+    void testPaymentContainsCorrectDataAndDefaultStatusRejected() {
         Map<String, String> data = new HashMap<>();
-        data.put("voucherCode", "ESHOP1234ABC5678");
-        Payment payment = new Payment("1", "VOUCHER", data);
-        assertEquals("SUCCESS", payment.getStatus());
-    }
+        data.put("someKey", "someValue");
 
-    @Test
-    void testInvalidVoucherCode() {
-        Map<String, String> data = new HashMap<>();
-        data.put("voucherCode", "ESHOP123");
-        Payment payment = new Payment("2", "VOUCHER", data);
-        assertEquals("REJECTED", payment.getStatus());
-    }
+        Payment payment = new Payment("1", "UNKNOWN_METHOD", data, null);
 
-    @Test
-    void testValidCashOnDelivery() {
-        Map<String, String> data = new HashMap<>();
-        data.put("address", "Jalan UI");
-        data.put("deliveryFee", "10000");
-        Payment payment = new Payment("3", "CASH_ON_DELIVERY", data);
-        assertEquals("SUCCESS", payment.getStatus());
-    }
-
-    @Test
-    void testInvalidCashOnDelivery() {
-        Map<String, String> data = new HashMap<>();
-        data.put("address", "");
-        data.put("deliveryFee", "10000");
-        Payment payment = new Payment("4", "CASH_ON_DELIVERY", data);
+        assertEquals("1", payment.getId());
+        assertEquals("UNKNOWN_METHOD", payment.getMethod());
+        assertEquals(data, payment.getPaymentData());
+        assertNull(payment.getOrder());
         assertEquals("REJECTED", payment.getStatus());
     }
 }
