@@ -53,10 +53,36 @@ Masalah *clean code* yang terjadi adalah **Code Duplication** dan pelanggaran pr
 
   Dengan cara ini, setup hanya ditulis satu kali dan bisa digunakan kembali oleh semua functional test, menjadikan kode lebih bersih dan mudah dikelola.
 
-## Reflection 2
+## Reflection 3
 
 ### 1. Code Quality Issues Fixed
    Dalam pengerjaan modul ini, saya melakukan pembersihan kode berdasarkan temuan code smells dari dashboard SonarCloud untuk meningkatkan kualitas aplikasi. Salah satu masalah yang saya perbaiki adalah keberadaan empty methods pada kelas pengujian yang dianggap tidak memiliki tujuan fungsional dan hanya mengotori kode. Strategi perbaikan yang saya terapkan adalah menghapus metode setup yang kosong atau menambahkan logika asersi yang bermakna agar setiap bagian kode memiliki peran yang jelas. Selain itu, saya juga menghapus beberapa unused imports dan merapikan kembali struktur kode agar lebih ringkas dan mudah dipelihara di masa depan. Masalah kritis lain yang saya tangani adalah perbaikan naming convention pada file HTML agar konsisten menggunakan huruf kecil, karena lingkungan Linux pada CI/CD sangat sensitif terhadap perbedaan huruf kapital. Melalui serangkaian perbaikan ini, kode saya kini memiliki tingkat maintainability yang jauh lebih baik dan berhasil melewati standar Quality Gate yang ditetapkan.
 
 ### 2. CI/CD Workflows Assessment
    Berdasarkan implementasi yang telah dilakukan, saya yakin bahwa alur kerja saat ini telah sepenuhnya memenuhi definisi Continuous Integration (CI) dan Continuous Deployment (CD). Setiap kali saya melakukan push kode ke repositori, GitHub Actions secara otomatis menjalankan rangkaian unit tes dan analisis statis melalui SonarCloud untuk memvalidasi kualitas kode secara instan. Proses otomatisasi ini memastikan bahwa hanya kode yang benar-benar stabil dan bersih yang dapat digabungkan ke dalam branch utama aplikasi. Di sisi lain, integrasi dengan PaaS seperti Koyeb yang menggunakan Dockerfile memastikan bahwa aplikasi saya selalu ter-deploy dalam versi terbaru secara otomatis setelah lolos tahap pengujian. Hal ini menghilangkan proses manual yang rentan terhadap kesalahan manusia serta mempercepat waktu perilisan fitur baru ke lingkungan produksi. Secara keseluruhan, kombinasi alat-alat ini telah menciptakan pipa pengembangan yang efisien, transparan, dan memiliki keandalan tinggi
+
+## Reflection 4
+
+### 1. TDD Flow Reflection (Percival, 2017)
+Setelah mengikuti alur Test-Driven Development (TDD) pada exercise ini, saya merasa bahwa pendekatan TDD cukup berguna dalam membantu saya membangun fitur Order dan Payment secara bertahap dan terstruktur. Dengan menulis test terlebih dahulu (tahap **RED**), saya dipaksa untuk memikirkan *behavior* yang diharapkan dari kode sebelum menulis implementasinya. Hal ini membuat saya lebih fokus dan terarah dalam mengembangkan fitur.
+
+Namun, berdasarkan self-reflective questions dari Percival (2017), saya menemukan beberapa area yang perlu ditingkatkan:
+
+* **"Are my tests giving me the confidence to refactor?"** — Pada beberapa kasus, test yang saya buat masih terlalu bergantung pada implementasi internal (misalnya, menguji apakah suatu method dipanggil), bukan pada *observable behavior*. Ke depannya, saya perlu lebih fokus menulis test yang menguji **output** dan **side effects**, bukan detail implementasi.
+* **"Am I testing the right things?"** — Saya menyadari bahwa beberapa test saya hanya memverifikasi bahwa endpoint mengembalikan status HTTP yang benar (200 OK atau 3xx Redirect), tanpa memvalidasi isi respons atau data yang disimpan. Ke depannya, saya perlu menambahkan assertion yang lebih bermakna, seperti memverifikasi bahwa model attribute berisi data yang benar atau bahwa data benar-benar tersimpan di repository.
+* **"Do I have enough tests?"** — Saya merasa test coverage untuk *negative cases* dan *edge cases* masih kurang. Misalnya, belum ada test untuk skenario ketika user mencoba membayar order yang tidak ada, atau ketika voucher code yang dimasukkan invalid. Ini adalah area yang harus saya perbaiki di iterasi berikutnya.
+
+Secara keseluruhan, TDD flow ini bermanfaat untuk menjaga disiplin pengembangan dan memastikan setiap fitur memiliki test coverage, meskipun kualitas test-nya sendiri masih bisa ditingkatkan.
+
+### 2. F.I.R.S.T. Principle Reflection
+Setelah mengevaluasi unit test yang telah saya buat, berikut analisis apakah test tersebut sudah memenuhi prinsip F.I.R.S.T.:
+
+* **Fast:** Sebagian besar test saya sudah cukup cepat karena menggunakan in-memory repository (ArrayList) dan tidak melibatkan database eksternal atau I/O yang berat. Test controller menggunakan `MockMvc` yang juga cukup cepat. Namun, beberapa test menggunakan `@SpringBootTest` yang memuat seluruh application context — ini bisa diperbaiki dengan menggunakan `@WebMvcTest` untuk menguji controller secara terisolasi agar lebih cepat.
+
+* **Isolated/Independent:** Belum sepenuhnya terpenuhi. Beberapa test saya saling bergantung karena menggunakan shared in-memory repository. Misalnya, jika `testPostCreateOrder` dijalankan sebelum test lain, produk yang dibuat akan tetap ada di repository dan bisa mempengaruhi test berikutnya. Ke depannya, saya perlu menambahkan mekanisme **cleanup** (misalnya `@BeforeEach` atau `@AfterEach`) untuk mereset state repository sebelum setiap test, sehingga setiap test benar-benar independen.
+
+* **Repeatable:** Test saya sudah repeatable karena tidak bergantung pada data eksternal atau kondisi lingkungan tertentu. Setiap test membuat data sendiri yang diperlukan untuk pengujian.
+
+* **Self-Validating:** Setiap test sudah memiliki assertion yang jelas (`assertEquals`, `assertTrue`, `status().isOk()`) sehingga hasilnya bisa langsung ditentukan pass atau fail tanpa perlu inspeksi manual.
+
+* **Timely:** Test ditulis sebelum atau bersamaan dengan implementasi, sesuai alur TDD yang diikuti. Test ditulis pada tahap RED sebelum implementasi pada tahap GREEN.

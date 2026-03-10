@@ -8,15 +8,13 @@ plugins {
     jacoco
     id("org.springframework.boot") version "3.2.2"
     id("io.spring.dependency-management") version "1.1.7"
-    id("org.sonarqube") version "7.1.0.6387"
+    id("org.sonarqube") version "7.2.3.7755"
 }
 
 sonar {
     properties {
-        property("sonar.projectKey", "B-Clairine-Christabel-Lim-2406359941_Modul-1-Coding-Standards")
+        property("sonar.projectKey", "B-Clairine-Christabel-Lim-2406359941_Modul-4-TDD-and-Refactoring")
         property("sonar.organization", "b-clairine-christabel-lim-2406359941")
-        property("sonar.host.url", "https://sonarcloud.io")
-        property("sonar.coverage.jacoco.xmlReportPaths", "build/reports/jacoco/test/xml/jacocoTestReport.xml")
     }
 }
 
@@ -90,5 +88,6 @@ tasks.jacocoTestReport {
     reports {
         xml.required.set(true)
         html.required.set(true)
+        csv.required.set(true)
     }
 }

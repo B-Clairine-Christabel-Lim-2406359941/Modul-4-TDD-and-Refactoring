@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Detail Form</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white"><h2>Submit Payment Details</h2></div>
+        <div class="card-body">
+            <form th:action="@{/payment/detail}" method="post">
+                <div class="form-group">
+                    <label>Additional Information (Voucher Code/Account Info):</label>
+                    <input type="text" class="form-control" name="paymentInfo" placeholder="Enter details here..." required>
+                </div>
+                <button type="submit" class="btn btn-success">Submit Payment</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
