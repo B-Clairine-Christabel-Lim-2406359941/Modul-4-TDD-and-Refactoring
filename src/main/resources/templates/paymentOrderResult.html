@@ -6,12 +6,29 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="container mt-5">
-    <div class="alert alert-success">
-        <h2>Payment Processed!</h2>
-        <p>Order ID: <span th:text="${orderId}"></span> has been updated.</p>
-        <a href="/order/history" class="btn btn-primary">Back to History</a>
+<div class="container mt-5 text-center">
+    <div th:if="${payment != null}">
+        <div th:if="${payment.status == 'SUCCESS'}" class="alert alert-success">
+            <h2>Payment Successful!</h2>
+            <p class="lead">Your payment for Order <strong th:text="${orderId}"></strong> has been processed successfully.</p>
+            <p>Payment ID: <strong th:text="${payment.id}"></strong></p>
+            <p>Method: <span th:text="${payment.method}"></span></p>
+            <p>Status: <span class="badge badge-success" th:text="${payment.status}"></span></p>
+        </div>
+        <div th:if="${payment.status != 'SUCCESS'}" class="alert alert-danger">
+            <h2>Payment Rejected</h2>
+            <p class="lead">Your payment for Order <strong th:text="${orderId}"></strong> was rejected.</p>
+            <p>Payment ID: <strong th:text="${payment.id}"></strong></p>
+            <p>Method: <span th:text="${payment.method}"></span></p>
+            <p>Status: <span class="badge badge-danger" th:text="${payment.status}"></span></p>
+        </div>
     </div>
+    <div th:if="${payment == null}" class="alert alert-warning">
+        <h2>Payment Error</h2>
+        <p>Could not process the payment. Order not found.</p>
+    </div>
+    <hr>
+    <a href="/order/history" class="btn btn-secondary">Back to Order History</a>
 </div>
 </body>
 </html>

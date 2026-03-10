@@ -26,12 +26,19 @@
             <tr>
                 <th>Order ID</th>
                 <th>Status</th>
+                <th>Action</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="order : ${orders}">
                 <td th:text="${order.id}"></td>
                 <td th:text="${order.status}"></td>
+                <td>
+                    <a th:if="${order.status == 'WAITING_PAYMENT'}"
+                       th:href="@{'/order/pay/' + ${order.id}}"
+                       class="btn btn-sm btn-success">Pay</a>
+                    <span th:if="${order.status != 'WAITING_PAYMENT'}" class="text-muted">-</span>
+                </td>
             </tr>
             </tbody>
         </table>
